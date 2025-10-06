@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoAgro Sostenible — Propuesta de Proyecto Profesional</title>
+  <meta name="author" content="Fernando Alvarez" />
+  <meta name="description" content="Propuesta detallada para el desarrollo de GeoAgro Sostenible, un juego educativo que utiliza datos satelitales de la NASA para enseñar agricultura sostenible y de precisión." />
+  <style>
+    /* --- Reset & Fonts --- */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Inter:wght@300;400;600&display=swap');
+    :root {
+      --bg-1: #041412;
+      --bg-2: #072b1f;
+      --accent: #16c77a;
+      --muted: #9ee6b8;
+      --glass: rgba(255,255,255,0.04);
+      --card: rgba(255,255,255,0.03);
+      --glass-2: rgba(255,255,255,0.02);
+      --text: #e6fff0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Poppins, system-ui;
+      background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 28px; }
+    header.nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #28ff96, #07a86b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #042;
+      font-weight: 800;
+    }
+    .title { font-size: 24px; font-weight: 700; }
+    .subtitle { font-size: 14px; color: var(--muted); }
+    .nav-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      background: var(--glass);
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.04);
+      cursor: pointer;
+      color: var(--text);
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.08); }
+    .btn.primary {
+      background: linear-gradient(90deg, var(--accent), #0fb06a);
+      color: #032;
+      font-weight: 700;
+    }
+    /* --- Hero --- */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: center;
+      margin-top: 32px;
+    }
+    .hero-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding: 32px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+    .h1 {
+      font-size: 48px;
+      line-height: 1.02;
+      margin: 0 0 12px;
+      font-family: Poppins, sans-serif;
+    }
+    .lead { color: var(--muted); margin-bottom: 24px; font-size: 16px; line-height: 1.5; }
+    .stats { display: flex; gap: 12px; flex-wrap: wrap; }
+    .stat {
+      background: var(--card);
+      padding: 12px;
+      border-radius: 10px;
+      min-width: 120px;
+      text-align: center;
+    }
+    .stat .v { font-weight: 700; font-size: 20px; color: var(--accent); }
+    /* --- Mock Map --- */
+    .mock-wrap { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.03); }
+    .mock-map {
+      height: 360px;
+      background-size: cover;
+      background-position: center;
+      filter: brightness(.6);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .mock-overlay {
+      padding: 16px;
+      color: #d9ffea;
+      background: linear-gradient(180deg, transparent, rgba(2,12,7,0.45));
+    }
+    .map-controls { display: flex; gap: 8px; margin-top: 12px; }
+    .chip {
+      background: var(--glass-2);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      border: 1px solid rgba(255,255,255,0.02);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .chip:hover { background: rgba(255,255,255,0.06); }
+    /* --- Content blocks --- */
+    .section { margin-top: 48px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015));
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .card h3 { margin: 0 0 12px; font-size: 20px; }
+    .muted { color: var(--muted); font-size: 16px; line-height: 1.5; }
+    .muted ul, .muted ol { margin-left: 20px; margin-top: 8px; }
+    .muted li { margin-bottom: 8px; }
+    /* --- Accordion --- */
+    .accordion { margin-top: 24px; }
+    .accordion-item { margin-bottom: 12px; }
+    .accordion-header {
+      background: var(--glass);
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .accordion-header::after {
+      content: '+';
+      font-size: 20px;
+    }
+    .accordion-item.active .accordion-header::after {
+      content: '-';
+    }
+    .accordion-content {
+      display: none;
+      padding: 16px;
+      background: var(--card);
+      border-radius: 0 0 8px 8px;
+      border: 1px solid rgba(255,255,255,0.03);
+      border-top: none;
+    }
+    .accordion-item.active .accordion-content { display: block; }
+    /* --- Images --- */
+    .img-container { margin: 24px 0; text-align: center; }
+    .img-container img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .img-caption { font-size: 14px; color: var(--muted); margin-top: 8px; }
+    /* --- Mock UI modal --- */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 80;
+    }
+    .modal.active { display: flex; }
+    .modal-card {
+      width: 90%;
+      max-width: 1200px;
+      background: linear-gradient(180deg, #02221a 0%, #043229 100%);
+      padding: 24px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 400px; gap: 16px; }
+    .mini-chart {
+      height: 100px;
+      background: linear-gradient(90deg, var(--accent), #0aa36a);
+      border-radius: 8px;
+    }
+    /* --- Footer --- */
+    footer {
+      margin-top: 48px;
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      border-top: 1px solid rgba(255,255,255,0.02);
+    }
+    /* --- Responsive --- */
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; padding-bottom: 8px; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    /* --- Subtle animations --- */
+    .pulse { animation: pulse 3s infinite; }
+    @keyframes pulse {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+      100% { transform: translateY(0); }
+    }
+    .glow { box-shadow: 0 8px 30px rgba(22,199,122,0.12); }
+    .tag {
+      font-size: 12px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+    .note { font-size: 13px; color: #9ae8be; margin-top: 8px; }
+    .badge-warning {
+      background: linear-gradient(90deg, #ffca6a, #ff9b3b);
+      color: #161200;
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- NAV -->
+    <header class="nav">
+      <div class="brand">
+        <div class="logo">GA</div>
+        <div>
+          <div class="title">GeoAgro Sostenible</div>
+          <div class="subtitle">Fernando Alvarez · Proyecto Educativo con Datos Satelitales de la NASA</div>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <button class="btn" onclick="scrollToSection('introduction')">Introducción</button>
+        <button class="btn" onclick="scrollToSection('concept')">Concepto</button>
+        <button class="btn" onclick="scrollToSection('science')">Fundamento Científico</button>
+        <button class="btn" onclick="scrollToSection('mechanics')">Mecánicas</button>
+        <button class="btn" onclick="scrollToSection('uiux')">UI/UX</button>
+        <button class="btn" onclick="scrollToSection('narrative')">Narrativa</button>
+        <button class="btn" onclick="scrollToSection('conclusion')">Conclusión</button>
+        <button class="btn primary" onclick="openModal()">Ver Mock UI</button>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-card">
+        <h1 class="h1">GeoAgro Sostenible</h1>
+        <p class="lead">Un juego educativo de simulación y estrategia que transforma datos satelitales de la NASA en una experiencia interactiva para enseñar agricultura sostenible y de precisión.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn primary" onclick="scrollToSection('introduction')">Explorar Propuesta</button>
+          <a class="btn" href="#" onclick="alert('Descarga: Dossier PDF (simulado)')">Descargar Dossier</a>
+        </div>
+        <div class="stats" style="margin-top:24px">
+          <div class="stat">
+            <div class="muted">NDVI (ej.)</div>
+            <div class="v" id="ndvi-value">0.78</div>
+            <div class="muted" id="ndvi-trend">Tendencia +4%</div>
+          </div>
+          <div class="stat">
+            <div class="muted">NDMI (ej.)</div>
+            <div class="v" id="ndmi-value">0.42</div>
+            <div class="muted" id="ndmi-trend">Tendencia -2%</div>
+          </div>
+          <div class="stat">
+            <div class="muted">Rendimiento</div>
+            <div class="v" id="prod-value">6.4 t/ha</div>
+            <div class="muted" id="prod-trend">Proy. +1.8%</div>
+          </div>
+        </div>
+        <div class="note">Nota: Esta página presenta la propuesta completa del proyecto, con visualizaciones y simulaciones interactivas.</div>
+      </div>
+
+      <!-- MOCK MAP -->
+      <aside class="mock-wrap">
+        <div class="mock-map" style="background-image: url('https://eoimages.gsfc.nasa.gov/images/imagerecords/149000/149460/argentina_tmo_2023082_lrg.jpg');">
+          <div class="mock-overlay">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:14px;color:#d8ffdf">Capa: <strong id="currentLayer">NDVI</strong></div>
+                <div style="font-size:13px;color:#bfe9c9">Área: 125 ha · Simulación</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div class="tag">Simulación</div>
+                <div class="badge-warning">DEMO VISUAL</div>
+              </div>
+            </div>
+            <div class="map-controls">
+              <div class="chip" onclick="switchLayer('NDVI')">NDVI</div>
+              <div class="chip" onclick="switchLayer('NDMI')">NDMI</div>
+              <div class="chip" onclick="switchLayer('Mapa Prod')">Mapa Prod</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;padding:12px;background:linear-gradient(180deg,rgba(0,0,0,0.3),transparent)">
+          <div class="chip" onclick="applyAction('Riego VR')">Riego VR <span style="opacity:0.7">· Demo</span></div>
+          <div class="chip" onclick="applyAction('Fertilización')">Fertilización <span style="opacity:0.7">· Demo</span></div>
+          <div class="chip" onclick="applyAction('Pastoreo')">Pastoreo <span style="opacity:0.7">· Demo</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- 1.0 Introducción -->
+    <section id="introduction" class="section">
+      <h2 class="h1" style="font-size:36px">1.0 Introducción: El Desafío Agrícola y la Solución Lúdica</h2>
+      <div class="accordion">
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">1.1. Análisis del Contexto Estratégico</div>
+          <div class="accordion-content">
+            <p class="muted">La agricultura global se encuentra en una encrucijada crítica. La necesidad de alimentar a una población mundial en crecimiento constante choca frontalmente con los desafíos impuestos por un clima cambiante, caracterizado por una mayor frecuencia de eventos catastróficos como sequías e inundaciones, y la progresiva degradación de los suelos. En este escenario de creciente incertidumbre, la integración de tecnología y datos objetivos se ha vuelto indispensable para fomentar una agricultura que no solo sea productiva, sino también resiliente y sostenible. La capacidad de tomar decisiones informadas, basadas en evidencia científica en tiempo casi real, es fundamental para la seguridad alimentaria y la estabilidad de los mercados. Este proyecto posiciona a "GeoAgro Sostenible" como una herramienta de alfabetización innovadora y accesible, diseñada para capacitar a una nueva generación en los principios de la gestión agrícola moderna.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">1.2. Visión del Proyecto</div>
+          <div class="accordion-content">
+            <p class="muted">"GeoAgro Sostenible" es un juego educativo de simulación y estrategia concebido para transformar la complejidad de los datos geoespaciales en una experiencia de aprendizaje interactiva y atractiva. El objetivo principal del proyecto es enseñar a un público general, sin necesidad de formación científica previa, los fundamentos de la agricultura sostenible y de precisión. Para lograrlo, el juego utiliza datos satelitales abiertos y reales, provenientes de las misiones de observación de la Tierra de la NASA, como el núcleo de su mecánica. Los jugadores asumirán el rol de gestores agrícolas y aprenderán a interpretar estos datos para tomar decisiones estratégicas, visualizando de manera directa las consecuencias de sus acciones sobre la salud de sus cultivos, la rentabilidad de su explotación y el impacto en el medio ambiente.</p>
+            <div class="img-container">
+              <img src="https://landsat.gsfc.nasa.gov/wp-content/uploads/2025/03/brazilag_oli2_20240626_front.jpg" alt="Imagen satelital Landsat de campos agrícolas">
+              <div class="img-caption">Imagen satelital Landsat de campos agrícolas.</div>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">1.3. Estructura de la Propuesta</div>
+          <div class="accordion-content">
+            <p class="muted">Este documento detalla la arquitectura conceptual y funcional de "GeoAgro Sostenible". A continuación, se desglosará el concepto central del juego y sus objetivos de aprendizaje específicos. Posteriormente, se explorará el fundamento científico, explicando cómo los datasets de la NASA se integran en la experiencia. Se describirán en detalle las mecánicas de juego principales, el diseño de la interfaz de usuario pensado para la accesibilidad y, finalmente, la narrativa educativa que guiará al jugador a través de los desafíos del mundo agrícola real. Esta estructura busca ofrecer una visión integral de cómo el juego fusiona ciencia, diseño y jugabilidad para crear una poderosa herramienta educativa.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2.0 Concepto y Objetivos del Juego -->
+    <section id="concept" class="section">
+      <h2 class="h1" style="font-size:36px">2.0 Concepto y Objetivos del Juego</h2>
+      <div class="accordion">
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">2.1. Establecimiento del Concepto Central</div>
+          <div class="accordion-content">
+            <p class="muted">La propuesta de valor única de "GeoAgro Sostenible" radica en transformar al jugador en un gestor agrícola moderno, enfrentándolo a un desafío de optimización multifacético. El objetivo no es simplemente maximizar la cosecha, sino equilibrar de forma sostenible tres pilares fundamentales: la productividad económica, la rentabilidad financiera y la sostenibilidad ambiental. En este simulador, el éxito se mide por la resiliencia y la salud a largo plazo de la explotación agrícola, enseñando al jugador que las ganancias a corto plazo pueden tener costos ambientales y productivos a futuro.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">2.2. Objetivos de Aprendizaje</div>
+          <div class="accordion-content">
+            <p class="muted">A través de la experiencia de juego, los jugadores desarrollarán competencias y conocimientos clave basados en los principios de la agricultura de precisión y la gestión sostenible de recursos. Los objetivos educativos específicos son:</p>
+            <ul class="muted">
+              <li>Interpretar datos geoespaciales: Aprender a comprender y utilizar mapas interactivos basados en índices de vegetación (como el NDVI), índices de estrés hídrico (NDMI) y pronósticos meteorológicos para fundamentar decisiones agrícolas informadas.</li>
+              <li>Optimizar el uso de recursos: Dominar técnicas avanzadas como el riego y la fertilización de tasa variable (VR), aplicando insumos únicamente donde y cuando son necesarios para reducir costos, aumentar la eficiencia y minimizar el impacto ambiental.</li>
+              <li>Comprender la relación causa-efecto: Visualizar directamente cómo las decisiones de manejo (por ejemplo, una fertilización excesiva o un riego inadecuado) impactan la salud de los cultivos y el entorno, recibiendo retroalimentación a través de la actualización de los datos satelitales simulados.</li>
+              <li>Enfrentar desafíos reales: Desarrollar estrategias proactivas para mitigar los efectos de eventos climáticos extremos, como sequías, utilizando los datos disponibles como un sistema de alerta temprana para la toma de decisiones críticas.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">2.3. Bucle de Juego Principal (Core Gameplay Loop)</div>
+          <div class="accordion-content">
+            <p class="muted">El ciclo de juego fundamental está diseñado para ser un proceso de aprendizaje continuo, estructurado en tres pasos claros y recurrentes:</p>
+            <ol class="muted">
+              <li>Observar y Analizar: El jugador comienza cada ciclo revisando el estado de su granja a través de un panel de control. Este panel presenta un mapa interactivo (GIS simplificado) que visualiza las capas de datos satelitales de la NASA, mostrando la salud actual de los cultivos, los niveles de agua y otras variables clave.</li>
+              <li>Decidir y Actuar: Basado en el análisis de los datos, el jugador planifica y ejecuta una serie de acciones agrícolas estratégicas. Estas acciones pueden incluir la activación de sistemas de riego, la aplicación de fertilizantes, la rotación del ganado entre potreros o la siembra de un nuevo cultivo.</li>
+              <li>Evaluar Resultados: Tras ejecutar las acciones, el juego simula el paso del tiempo (un día, una semana, etc.) y actualiza los datos satelitales. El jugador puede entonces observar las consecuencias directas de sus decisiones: un campo estresado por falta de agua mostrará una caída en su índice de vegetación, mientras que una gestión eficiente se traducirá en cultivos vigorosos y un mejor rendimiento.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">2.4. Transición a la Base Científica</div>
+          <div class="accordion-content">
+            <p class="muted">Este bucle de juego, que combina observación, acción y retroalimentación, está directamente anclado en los datos científicos reales que lo sustentan. A continuación, se detallará cómo los datasets específicos de la NASA se integran para dar vida a esta simulación educativa.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3.0 Fundamento Científico -->
+    <section id="science" class="section">
+      <h2 class="h1" style="font-size:36px">3.0 Fundamento Científico: La Integración de Datos Satelitales de la NASA</h2>
+      <div class="accordion">
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">3.1. Introducción a la Teledetección en el Juego</div>
+          <div class="accordion-content">
+            <p class="muted">La decisión estratégica de utilizar datos reales de la NASA como base para "GeoAgro Sostenible" es lo que distingue a este proyecto de las simulaciones agrícolas abstractas. Este enfoque ancla la experiencia de aprendizaje en la ciencia y la tecnología que los profesionales del sector utilizan a diario en todo el mundo. Al interactuar con versiones simplificadas de estos datasets, los jugadores no solo aprenden sobre agricultura, sino que también obtienen una comprensión fundamental de cómo la teledetección satelital se ha convertido en una herramienta indispensable para la gestión sostenible de los recursos de nuestro planeta.</p>
+            <div class="img-container">
+              <img src="https://www.frontiersin.org/files/Articles/469303/fsufs-03-00054-HTML/image_m/fsufs-03-00054-g001.jpg" alt="Ilustración de agricultura sostenible con datos satelitales">
+              <div class="img-caption">Ilustración de agricultura sostenible con datos satelitales.</div>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">3.2. Análisis de los Datasets Clave</div>
+          <div class="accordion-content">
+            <div class="grid-3">
+              <div class="card">
+                <h3>3.2.1 Salud de la Vegetación (NDVI desde MODIS y Landsat)</h3>
+                <p class="muted">El Índice de Vegetación de Diferencia Normalizada (NDVI) es el indicador más utilizado para el monitoreo de la salud y el vigor de los cultivos. Se calcula a partir de la luz que las plantas reflejan en las bandas del rojo y del infrarrojo cercano (NIR). Funciona porque la clorofila de las plantas sanas absorbe la luz roja para la fotosíntesis, mientras que la estructura celular de las hojas refleja fuertemente la luz NIR. Así, el NDVI actúa como un indicador indirecto de la densidad y salud de la vegetación. En el juego, los mapas de NDVI, provenientes de misiones como MODIS y Landsat, serán la herramienta visual principal para evaluar el estado de los cultivos. Un NDVI alto (verde intenso) indicará un cultivo saludable, mientras que un NDVI bajo (amarillo/marrón) señalará estrés. Sin embargo, el juego también enseñará una limitación clave del NDVI: su saturación. En vegetación muy densa, el índice alcanza un valor máximo y deja de mostrar variaciones, ocultando diferencias sutiles en campos muy productivos.</p>
+                <div class="img-container">
+                  <img src="https://www.researchgate.net/publication/355629719/figure/fig1/AS:1083325238255618@1635296272388/An-example-of-NDVI-map-visualization.jpg" alt="Ejemplo de mapa NDVI para agricultura">
+                  <div class="img-caption">Ejemplo de mapa NDVI para agricultura.</div>
+                </div>
+              </div>
+              <div class="card">
+                <h3>3.2.2 Estrés Hídrico (NDMI / NDWI desde MODIS y Landsat)</h3>
+                <p class="muted">Para gestionar el riego de manera eficiente, el jugador utilizará el Índice de Humedad de Diferencia Normalizada (NDMI), también conocido como NDWI. Este índice es especialmente sensible al contenido de agua en las hojas de las plantas, lo que lo convierte en un detector directo del estrés hídrico. En el juego, los datos del NDMI, derivados de misiones de la NASA como Landsat y MODIS, permitirán al jugador identificar con precisión las zonas de un campo que sufren por falta de agua (sequía) o por exceso de ella (anegamiento). Esta capa de datos es fundamental para tomar decisiones de riego de precisión, permitiendo aplicar agua solo donde es necesario y evitando el desperdicio de este recurso vital.</p>
+                <div class="img-container">
+                  <img src="https://i0.wp.com/geopard.tech/wp-content/uploads/2021/11/AnyConv.com__image-4.webp?fit=1600%2C832&ssl=1" alt="Ejemplo de uso de NDVI en agricultura de precisión">
+                  <div class="img-caption">Ejemplo de uso de NDVI en agricultura de precisión.</div>
+                </div>
+              </div>
+              <div class="card">
+                <h3>3.2.3 Pronóstico Meteorológico Integrado</h3>
+                <p class="muted">Aunque los datos satelitales ofrecen una visión del estado actual de los cultivos, la planificación agrícola eficaz requiere mirar hacia el futuro. "GeoAgro Sostenible" integrará un sistema de pronóstico meteorológico que proporcionará al jugador datos sobre variables climáticas clave como precipitación y temperatura. Esta información no proviene directamente de un único satélite de la NASA, sino que representa la fusión de datos que los sistemas modernos utilizan. Al combinar los pronósticos de lluvia con el análisis del estrés hídrico del NDMI, el jugador podrá tomar decisiones de riego más inteligentes, como posponer un riego si se espera lluvia, conservando así agua y reduciendo costos operativos.</p>
+                <div class="img-container">
+                  <img src="https://svs.gsfc.nasa.gov/vis/a030000/a031000/a031053/CMG_0_05_Deg_16_days_NDVI_print.jpg" alt="Mapa global de índice de vegetación de MODIS">
+                  <div class="img-caption">Mapa global de índice de vegetación de MODIS.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">3.3. Simplificación para la Jugabilidad</div>
+          <div class="accordion-content">
+            <p class="muted">Si bien el juego se basa en datos científicos complejos, su presentación debe ser intuitiva y accesible. Para evitar la sobrecarga de información, la interfaz de "GeoAgro Sostenible" traducirá los datos numéricos brutos en visualizaciones claras y accionables. La interfaz abstrae la complejidad del análisis GIS, traduciendo datos numéricos de reflectancia en un indicador de salud de "semáforo" (rojo, amarillo, verde) que es inmediatamente accionable por el jugador. Se utilizarán mapas con códigos de colores estandarizados y gráficos de tendencias simples que muestren la evolución de las variables a lo largo del tiempo.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">3.4. Transición a las Mecánicas</div>
+          <div class="accordion-content">
+            <p class="muted">Con una comprensión clara de los datos que impulsan el juego, podemos ahora explorar cómo estos se traducen en acciones concretas y mecánicas de juego interactivas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4.0 Mecánicas de Juego Detalladas -->
+    <section id="mechanics" class="section">
+      <h2 class="h1" style="font-size:36px">4.0 Mecánicas de Juego Detalladas</h2>
+      <div class="accordion">
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">4.1. Introducción a la Simulación Interactiva</div>
+          <div class="accordion-content">
+            <p class="muted">Esta sección desglosa las acciones específicas que el jugador puede realizar dentro del juego. Cada mecánica ha sido cuidadosamente diseñada para ser una aplicación directa de los datos satelitales, creando un ciclo virtuoso de aprendizaje basado en la acción y la retroalimentación. Las decisiones del jugador no son arbitrarias; son hipótesis que se ponen a prueba contra la simulación, y los resultados, visibles en los datos actualizados, refuerzan los objetivos de aprendizaje, incluyendo la comprensión de las limitaciones de ciertos tipos de datos.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">4.2. Gestión del Riego</div>
+          <div class="accordion-content">
+            <p class="muted">· Análisis: Para decidir si regar, el jugador consultará principalmente el mapa del Índice de Humedad de Diferencia Normalizada (NDMI), un indicador que detecta específicamente el estrés hídrico en las plantas a partir de datos de misiones como Landsat y MODIS. Este mapa le mostrará las zonas exactas que necesitan agua. Adicionalmente, revisará el pronóstico meteorológico integrado para evitar riegos innecesarios si se esperan lluvias.</p>
+            <p class="muted">· Acción: El jugador podrá activar sus sistemas de riego. El juego ofrecerá dos modalidades: una aplicación uniforme en todo el campo o, para enseñar prácticas avanzadas, una aplicación de tasa variable (VR). Con la VR, el jugador puede dirigir el agua únicamente a las zonas con bajo NDMI identificadas en el análisis.</p>
+            <p class="muted">· Retroalimentación: Tras la acción, una simulación del paso del tiempo mostrará una mejora en los valores del NDMI en las zonas regadas, previniendo una caída en el NDVI (salud del cultivo). Sin embargo, el uso excesivo de agua se reflejará negativamente en el presupuesto (aumento de costos) y podría generar un estrés por anegamiento, afectando también el NDVI.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">4.3. Gestión de la Fertilización</div>
+          <div class="accordion-content">
+            <p class="muted">· Análisis: El jugador aprenderá el concepto de "zone mapping" o mapa de productividad. Utilizando el archivo histórico de datos de la misión Landsat de la NASA, el juego permitirá crear un "mapa de productividad". Este mapa, basado en datos de NDVI de temporadas anteriores, identifica visualmente las zonas del campo que, de forma consistente, han sido más o menos productivas a lo largo del tiempo.</p>
+            <p class="muted">· Acción: El jugador aplicará la fertilización de tasa variable (VR). En lugar de esparcir una cantidad uniforme de fertilizante por todo el campo, asignará dosis más altas a las zonas de alta productividad (con mayor potencial de rendimiento) y dosis más bajas a las de baja productividad, optimizando el uso del recurso y la inversión.</p>
+            <p class="muted">· Retroalimentación: Una correcta aplicación de VR se reflejará en un NDVI saludable y uniforme y, al final de la temporada, en un alto rendimiento de la cosecha. El exceso de fertilizante no solo aumentará los costos, sino que también activará una alerta de impacto ambiental por lixiviación de nutrientes. Una fertilización insuficiente, por otro lado, resultará en un NDVI bajo y un menor rendimiento.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">4.4. Gestión del Ganado</div>
+          <div class="accordion-content">
+            <p class="muted">· Análisis: El jugador utilizará los mapas de NDVI de sus pastizales para monitorizar la salud y la biomasa del forraje disponible. Un NDVI alto indicará pastos abundantes y saludables, listos para el pastoreo.</p>
+            <p class="muted">· Acción: El jugador implementará la mecánica de "pastoreo rotacional". Seleccionará un rebaño y lo moverá de un potrero a otro, basándose en el análisis del NDVI, para evitar el sobrepastoreo y permitir que los pastos se recuperen.</p>
+            <p class="muted">· Retroalimentación: Inmediatamente después de mover el ganado, el potrero desocupado comenzará a mostrar una recuperación gradual en su NDVI a lo largo del tiempo. Si el jugador deja al ganado demasiado tiempo en un mismo lugar, observará una caída drástica del NDVI en esa zona, lo que simboliza la degradación del suelo y resultará en una penalización en la salud y productividad del ganado.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">4.5. Transición al Diseño de Interfaz</div>
+          <div class="accordion-content">
+            <p class="muted">Estas mecánicas, aunque distintas, deben presentarse al jugador de una manera unificada y coherente. El diseño de la interfaz de usuario es el puente que conecta los datos y las acciones, creando una experiencia de juego fluida e intuitiva que se describe en la siguiente sección.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5.0 Diseño de Interfaz y Experiencia de Usuario -->
+    <section id="uiux" class="section">
+      <h2 class="h1" style="font-size:36px">5.0 Diseño de Interfaz y Experiencia de Usuario (UI/UX)</h2>
+      <div class="accordion">
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">5.1. Filosofía de Diseño</div>
+          <div class="accordion-content">
+            <p class="muted">La filosofía de diseño de "GeoAgro Sostenible" se centra en tres pilares: claridad, intuición y atractivo visual. El objetivo primordial es desmitificar el análisis de datos geoespaciales, transformándolo de una tarea potencialmente intimidante a una actividad atractiva y empoderadora. Para ello, se adoptará un enfoque de "GIS simplificado", donde la potencia del análisis espacial se presenta a través de controles sencillos y visualizaciones directas. La interfaz abstrae la complejidad del análisis GIS, traduciendo datos numéricos de reflectancia en un indicador de salud de "semáforo" (rojo, amarillo, verde) que es inmediatamente accionable por el jugador.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">5.2. Descripción de Pantallas de Ejemplo</div>
+          <div class="accordion-content">
+            <p class="muted">Pantalla Principal / Panel de Control (Dashboard)</p>
+            <ul class="muted">
+              <li>Vista Principal: Un mapa interactivo de la granja del jugador, con una vista aérea satelital. Los límites de cada campo, pastizal y parcela estarán claramente delimitados y serán seleccionables.</li>
+              <li>Selector de Capas de Datos: Un menú lateral, claro y accesible, que permitirá al jugador superponer diferentes capas de datos sobre el mapa. Las opciones incluirán 'Salud de la Vegetación (NDVI)', 'Estrés Hídrico (NDMI)' y 'Mapa de Productividad (Landsat)'.</li>
+              <li>Barra de Estado: Ubicada en la parte superior de la pantalla, mostrará de un vistazo los indicadores clave del juego: presupuesto disponible, fecha actual/estación del año, y un sistema de notificaciones para alertas importantes (ej: "⚠️ Alerta de sequía en Campo 3").</li>
+              <li>Menú de Acciones: Una barra de herramientas con botones grandes e icónicos para las acciones principales: 'Riego', 'Fertilización', 'Gestión de Ganado' y 'Mercado'.</li>
+            </ul>
+            <p class="muted">Pantalla de Análisis de Campo</p>
+            <ul class="muted">
+              <li>Vista Detallada: El mapa se centrará automáticamente en el campo seleccionado, mostrando la capa de datos activa con mayor detalle.</li>
+              <li>Gráficos Históricos: Un área de la pantalla mostrará un gráfico de líneas simple y limpio que ilustra la evolución del NDVI y el NDMI para ese campo a lo largo de la temporada actual. Esto permite al jugador identificar tendencias rápidamente.</li>
+              <li>Información Relevante: Un cuadro de texto conciso presentará datos clave sobre el campo: tipo de cultivo, etapa de crecimiento actual y un sistema de recomendaciones inteligentes generadas por el juego (ej: "Consejo: El NDVI ha disminuido un 15% en la última semana. Considere revisar los niveles de estrés hídrico con el NDMI.").</li>
+            </ul>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">5.3. Visualización de Datos</div>
+          <div class="accordion-content">
+            <p class="muted">La clave para una experiencia de usuario exitosa es la traducción de datos complejos en información visualmente intuitiva. Para lograrlo, el juego empleará gradientes de color estandarizados y fáciles de interpretar. Por ejemplo, la capa de NDVI siempre usará una paleta que va del marrón/rojo (vegetación escasa o estresada) al verde oscuro (vegetación densa y saludable). Toda la visualización estará diseñada para una interpretación rápida y directa, permitiendo que el jugador tome decisiones en segundos.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">5.4. Transición a la Narrativa</div>
+          <div class="accordion-content">
+            <p class="muted">Una interfaz clara e intuitiva es el lienzo sobre el cual se construye la experiencia de aprendizaje. Esta base funcional permite que la narrativa educativa y los escenarios de desafío se desarrollen de manera efectiva, guiando al jugador a través de su viaje para convertirse en un agricultor sostenible.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6.0 Narrativa Educativa y Escenarios de Desafío -->
+    <section id="narrative" class="section">
+      <h2 class="h1" style="font-size:36px">6.0 Narrativa Educativa y Escenarios de Desafío</h2>
+      <div class="accordion">
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">6.1. El Rol de la Narrativa en el Aprendizaje</div>
+          <div class="accordion-content">
+            <p class="muted">En "GeoAgro Sostenible", la narrativa no es un mero adorno, sino un componente pedagógico central diseñado para contextualizar el aprendizaje y motivar al jugador. El juego enmarcará la experiencia como un viaje progresivo. El jugador comenzará con una pequeña granja y recursos limitados, y a medida que demuestre su dominio de las prácticas agrícolas sostenibles y de precisión, desbloqueará nuevos terrenos, tecnologías más avanzadas y enfrentará desafíos a mayor escala. Esta progresión estructurada asegura que los conceptos se introduzcan de manera gradual y se refuercen a través de la aplicación práctica.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">6.2. Tutorial y Explicación de Conceptos</div>
+          <div class="accordion-content">
+            <p class="muted">Para garantizar la accesibilidad a un público no especializado, el juego contará con un sistema de tutorial integrado y contextual. Cuando el jugador se encuentre por primera vez con un nuevo tipo de dato, el juego presentará una explicación concisa y visual. Por ejemplo, al presentar el NDVI por primera vez, una ventana emergente mostrará dos imágenes de plantas, una sana y otra estresada, y explicará visualmente cómo la planta sana refleja más luz infrarroja cercana (NIR), resultando en un valor NDVI alto, representado por el color verde intenso en el mapa del juego. De esta manera, se alfabetiza al jugador en la terminología y las herramientas de la agrotecnología moderna.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">6.3. Escenarios Basados en Desafíos Reales</div>
+          <div class="accordion-content">
+            <p class="muted">Para simular las complejidades de la agricultura real, el juego presentará al jugador una serie de escenarios de desafío dinámicos. Estos eventos pondrán a prueba su capacidad para aplicar los conocimientos adquiridos.</p>
+            <ul class="muted">
+              <li>Escenario de Sequía: El jugador recibe una alerta de bajas precipitaciones del pronóstico meteorológico. Deberá usar los datos de NDMI para monitorizar el aumento del estrés hídrico en sus cultivos y gestionar sus reservas de agua de manera ultraeficiente, aplicando riego de precisión solo en las áreas más críticas para salvar la cosecha.</li>
+              <li>Escenario de Anomalía Desconocida: Una sección de un campo muestra una caída repentina y localizada del NDVI, pero la causa no es obvia. El jugador deberá investigar como un detective de datos: consultará la capa NDMI para descartar estrés hídrico; revisará el mapa de productividad histórico de Landsat para ver si es una zona crónicamente pobre; y con esa información, deberá diagnosticar si el problema es un brote de plagas o una deficiencia de nutrientes antes de aplicar la solución correcta. Esto enseña la habilidad crítica de la fusión de datos.</li>
+              <li>Escenario de Mercado: Al inicio de una nueva temporada, el jugador deberá decidir qué cultivo plantar. Tendrá que analizar los pronósticos climáticos a largo plazo para evaluar la resiliencia de diferentes cultivos a posibles sequías, y al mismo tiempo, considerar la demanda y los precios del mercado para equilibrar el riesgo agronómico con la recompensa económica.</li>
+            </ul>
+            <div class="img-container">
+              <img src="https://www.frontiersin.org/files/Articles/469303/fsufs-03-00054-HTML/image_m/fsufs-03-00054-g001.jpg" alt="Ilustración de agricultura sostenible con datos satelitales">
+              <div class="img-caption">Ilustración de agricultura sostenible con datos satelitales.</div>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">6.4. Transición a la Conclusión</div>
+          <div class="accordion-content">
+            <p class="muted">La combinación de mecánicas de juego sólidas, una interfaz clara y una narrativa atractiva con desafíos realistas, transforma a "GeoAgro Sostenible" en una poderosa y completa herramienta educativa. Esta sinergia es la que permite alcanzar el impacto potencial que se describe en la conclusión de esta propuesta.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7.0 Conclusión e Impacto Potencial -->
+    <section id="conclusion" class="section">
+      <h2 class="h1" style="font-size:36px">7.0 Conclusión e Impacto Potencial</h2>
+      <div class="accordion">
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">7.1. Síntesis de la Propuesta</div>
+          <div class="accordion-content">
+            <p class="muted">"GeoAgro Sostenible" es una propuesta para el desarrollo de un juego educativo innovador que aborda los desafíos críticos de la agricultura moderna. A través de una simulación interactiva y atractiva, el juego convierte a los jugadores en gestores de granjas sostenibles, enseñándoles a equilibrar productividad, rentabilidad y responsabilidad ambiental. Su característica más distintiva y poderosa es el uso de datos satelitales reales y abiertos de la NASA como el núcleo de su mecánica de juego, lo que ancla la experiencia de aprendizaje en la ciencia y tecnología que están transformando la agricultura global.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">7.2. Evaluación del Impacto Educativo</div>
+          <div class="accordion-content">
+            <p class="muted">El impacto potencial de "GeoAgro Sostenible" trasciende el entretenimiento. Al hacer accesibles y comprensibles los conceptos de la teledetección, los Sistemas de Información Geográfica (GIS) y la agricultura de precisión para un público general, el juego puede generar un efecto multiplicador significativo. Tiene el potencial de aumentar la conciencia pública sobre la importancia de la agricultura sostenible y los complejos desafíos que enfrentan los productores de alimentos. Además, al presentar la tecnología y la ciencia de datos de una manera práctica y emocionante, puede servir como una puerta de entrada para fomentar el interés en carreras STEM (Ciencia, Tecnología, Ingeniería y Matemáticas) entre jóvenes y adultos.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">7.3. Visión a Futuro</div>
+          <div class="accordion-content">
+            <p class="muted">Esta propuesta representa el punto de partida para una plataforma de aprendizaje en constante evolución. En el futuro, "GeoAgro Sostenible" podría expandirse para incluir datasets y tecnologías más avanzadas. Por ejemplo, se podrían incorporar los datos térmicos de la misión Landsat para un monitoreo más detallado del estrés hídrico a través de la evapotranspiración, como lo demuestran las aplicaciones actuales del sector. Otra expansión crucial sería la integración de datos de Radar de Apertura Sintética (SAR), que tienen la capacidad única de "ver a través de las nubes", superando la principal limitación de los sensores ópticos y garantizando el monitoreo en regiones tropicales o en épocas de mal tiempo. De esta manera, el juego evolucionaría junto con la ciencia, enseñando sobre la gestión sostenible de los recursos más valiosos de nuestro planeta.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>© 2025 GeoAgro Sostenible — Fernando Alvarez · Todos los derechos reservados.</div>
+      <div style="margin-top:8px">Contacto: fernandoalvarezofi@gmail.com</div>
+    </footer>
+  </div>
+
+  <!-- Mock UI modal -->
+  <div id="modal" class="modal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:18px;color:var(--accent);font-weight:700">Mock UI — Panel del Gestor</div>
+          <div style="color:var(--muted);font-size:13px;margin-top:6px">Interfaz conceptual — sin backend. Botones marcados como “No funcional”.</div>
+        </div>
+        <button class="btn" onclick="closeModal()">Cerrar</button>
+      </div>
+
+      <div class="grid-2" style="margin-top:12px">
+        <div style="padding-right:8px">
+          <div style="border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)">
+            <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1400&q=60" style="width:100%;height:280px;object-fit:cover;display:block" alt="Mock map">
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn primary" onclick="applyAction('Riego VR')">Aplicar riego VR</button>
+            <button class="btn" onclick="applyAction('Fertilización')">Fertilización</button>
+          </div>
+        </div>
+
+        <aside style="padding-left:8px">
+          <div class="card">
+            <h4 style="margin:0">Resumen campo</h4>
+            <p class="muted" style="margin-top:6px" id="modal-stats">NDVI: 0.78 · NDMI: 0.42 · Rend: 6.4 t/ha</p>
+            <div style="margin-top:8px">
+              <div style="font-size:13px;color:var(--muted)">Gráfica de tendencia</div>
+              <div class="mini-chart" style="margin-top:8px;border-radius:8px"></div>
+            </div>
+            <div style="margin-top:10px">
+              <div class="muted">Acciones rápidas</div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn" onclick="applyAction('Mover Ganado')">Mover ganado</button>
+                <button class="btn" onclick="alert('Plan sugerido (demo)')">Plan sugerido</button>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock data for simulation
+    const fieldData = {
+      NDVI: { value: 0.78, trend: 4, status: 'Saludable' },
+      NDMI: { value: 0.42, trend: -2, status: 'Estrés Moderado' },
+      Productivity: { value: 6.4, trend: 1.8, status: 'Estable' }
+    };
+
+    function toggleAccordion(element) {
+      const item = element.parentElement;
+      item.classList.toggle('active');
+    }
+
+    function openModal() {
+      document.getElementById('modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+
+    function switchLayer(name) {
+      document.getElementById('currentLayer').textContent = name;
+      const el = document.querySelector('.mock-map');
+      el.style.transition = 'filter .6s ease, transform .4s ease';
+      el.style.transform = 'scale(1.01)';
+      setTimeout(() => el.style.transform = 'scale(1)', 420);
+    }
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function applyAction(action) {
+      if (action === 'Riego VR') {
+        fieldData.NDMI.value = 0.48;
+        fieldData.NDMI.trend = 3;
+        fieldData.NDMI.status = 'Mejorando';
+      } else if (action === 'Fertilización') {
+        fieldData.NDVI.value = 0.82;
+        fieldData.NDVI.trend = 6;
+        fieldData.NDVI.status = 'Óptimo';
+      } else if (action === 'Mover Ganado') {
+        fieldData.Productivity.value = 6.6;
+        fieldData.Productivity.trend = 2.5;
+        fieldData.Productivity.status = 'Creciente';
+      }
+      updateStats();
+      alert(`${action} aplicado (simulación). Datos actualizados.`);
+    }
+
+    function updateStats() {
+      document.getElementById('ndvi-value').textContent = fieldData.NDVI.value;
+      document.getElementById('ndvi-trend').textContent = `Tendencia ${fieldData.NDVI.trend}%`;
+      document.getElementById('ndmi-value').textContent = fieldData.NDMI.value;
+      document.getElementById('ndmi-trend').textContent = `Tendencia ${fieldData.NDMI.trend}%`;
+      document.getElementById('prod-value').textContent = `${fieldData.Productivity.value} t/ha`;
+      document.getElementById('prod-trend').textContent = `Proy. ${fieldData.Productivity.trend}%`;
+      document.getElementById('modal-stats').textContent = `NDVI: ${fieldData.NDVI.value} · NDMI: ${fieldData.NDMI.value} · Rend: ${fieldData.Productivity.value} t/ha`;
+    }
+  </script>
+</body>
+</html>
